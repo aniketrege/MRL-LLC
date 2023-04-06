@@ -52,7 +52,7 @@ class BinaryLinearLayer(nn.Linear):
 
 
 class MRL_Linear_Layer(nn.Module):
-	def __init__(self, nesting_list: List, binary_nesting_list=List, num_classes=1000, efficient=False, **kwargs):
+	def __init__(self, nesting_list: List, binary_nesting_list: List, num_classes=1000, efficient=False, **kwargs):
 		super(MRL_Linear_Layer, self).__init__()
 		self.nesting_list=nesting_list
 		self.binary_nesting_list=binary_nesting_list

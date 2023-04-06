@@ -384,7 +384,7 @@ class ImageNetTrainer:
         if self.nesting:
             ff= "MRL-E" if self.efficient else "MRL"
             print(f"Creating classification layer of type :\t {ff}")
-            model.fc = MRL_Linear_Layer(self.nesting_list, num_classes=1000, efficient=self.efficient)
+            model.fc = MRL_Linear_Layer(self.nesting_list, self.binary_nesting_list, num_classes=1000, efficient=self.efficient)
         elif self.fixed_feature != 2048:
             print("Using Fixed Features.... ")
             model.fc =  FixedFeatureLayer(self.fixed_feature, 1000)
@@ -498,6 +498,12 @@ class ImageNetTrainer:
                         self.val_meters[s](output[i], target)
                         s = "top_5_{}".format(self.nesting_list[i])
                         self.val_meters[s](output[i], target)
+                    
+                    for i in range(len(self.binary_nesting_list)):
+                        s = "top_1_binary_{}".format(self.binary_nesting_list[i])
+                        self.val_meters[s](output[len(self.nesting_list)+i], target)
+                        s = "top_5_binary_{}".format(self.binary_nesting_list[i])
+                        self.val_meters[s](output[len(self.nesting_list)+i], target)
 
                     loss_val = self.loss(output, target)
                     self.val_meters['loss'](loss_val)
@@ -516,6 +522,10 @@ class ImageNetTrainer:
 
             for i in self.nesting_list:
                 self.val_meters['top_5_{}'.format(i)] = torchmetrics.Accuracy(compute_on_step=False, top_k=5).to(self.gpu)
+            
+            for i in self.binary_nesting_list:
+                self.val_meters['top_1_binary_{}'.format(i)] = torchmetrics.Accuracy(compute_on_step=False).to(self.gpu)
+                self.val_meters['top_5_binary_{}'.format(i)] = torchmetrics.Accuracy(compute_on_step=False, top_k=5).to(self.gpu)
 
             self.val_meters['loss'] = MeanScalarMetric(compute_on_step=False).to(self.gpu)
 

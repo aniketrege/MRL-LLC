@@ -50,7 +50,7 @@ args = parser.parse_args()
 model = resnet50(False)
 if not args.old_ckpt:
 	if args.mrl:
-		model.fc = MRL_Linear_Layer(NESTING_LIST, efficient=args.efficient)	
+		model.fc = MRL_Linear_Layer(NESTING_LIST, BINARY_NESTING_LIST, efficient=args.efficient)	
 	else:
 		model.fc=FixedFeatureLayer(args.rep_size, 1000)
 else:
