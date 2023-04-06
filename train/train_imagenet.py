@@ -47,7 +47,9 @@ Section('model', 'model details').params(
     efficient=Param(int, "MRL-E?", default=0),
     mrl=Param(int, "MRL?", default=0),
     nesting_start=Param(int, '2**i will be starting dimension for nesting', default=3),
-    fixed_feature=Param(int, 'In case we want to do the fixed feature training, by default it is 2048', default=2048)
+    fixed_feature=Param(int, 'In case we want to do the fixed feature training, by default it is 2048', default=2048),
+    mrl_nesting_list=Param(str, 'Binarized nesting list as str', default='[32, 2048]'),
+    binarized_nesting_list=Param(str, 'Binarized nesting list as str', default='[4, 8, 16, 32]')
 )
 
 Section('resolution', 'resolution scheduling').params(
@@ -148,13 +150,17 @@ class ImageNetTrainer:
     @param('model.mrl')
     @param('model.nesting_start')
     @param('model.fixed_feature')
-    def __init__(self, gpu, distributed, efficient, mrl, nesting_start, fixed_feature):
+    @param('model.mrl_nesting_list')
+    @param('model.binarized_nesting_list')
+    def __init__(self, gpu, distributed, efficient, mrl, nesting_start, fixed_feature, mrl_nesting_list, binarized_nesting_list):
         self.all_params = get_current_config(); 
         self.gpu = gpu
         self.efficient = efficient
         self.nesting = (self.efficient or mrl)
         self.nesting_start = nesting_start
-        self.nesting_list = [2**i for i in range(self.nesting_start, 12)] if self.nesting else None
+#         self.nesting_list = [2**i for i in range(self.nesting_start, 12)] if self.nesting else None
+        self.nesting_list = [int(e) for e in mrl_nesting_list.strip('][').split(', ')]
+        self.binary_nesting_list = [int(e) for e in binarized_nesting_list.strip('][').split(', ')]
         self.fixed_feature=fixed_feature
         self.uid = str(uuid4())
 
