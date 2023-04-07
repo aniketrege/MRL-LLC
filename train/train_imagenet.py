@@ -160,7 +160,10 @@ class ImageNetTrainer:
         self.nesting_start = nesting_start
 #         self.nesting_list = [2**i for i in range(self.nesting_start, 12)] if self.nesting else None
         self.nesting_list = [int(e) for e in mrl_nesting_list.strip('][').split(', ')]
-        self.binary_nesting_list = [int(e) for e in binarized_nesting_list.strip('][').split(', ')]
+        if binarized_nesting_list == '[]':
+            self.binary_nesting_list = []
+        else:
+            self.binary_nesting_list = [int(e) for e in binarized_nesting_list.strip('][').split(', ')]
         self.fixed_feature=fixed_feature
         self.uid = str(uuid4())
 
@@ -531,6 +534,8 @@ class ImageNetTrainer:
             
             for i in self.binary_nesting_list:
                 self.val_meters['top_1_binary_{}'.format(i)] = torchmetrics.Accuracy(compute_on_step=False).to(self.gpu)
+            
+            for i in self.binary_nesting_list:
                 self.val_meters['top_5_binary_{}'.format(i)] = torchmetrics.Accuracy(compute_on_step=False, top_k=5).to(self.gpu)
 
             self.val_meters['loss'] = MeanScalarMetric(compute_on_step=False).to(self.gpu)
